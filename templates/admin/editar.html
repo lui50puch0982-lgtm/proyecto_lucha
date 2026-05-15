@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Atleta</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Modificar Registro</h2>
+        <form method="POST">
+            <label>Nombre Completo</label>
+            <input type="text" name="nombre_completo" value="{{ l.nombre_completo }}" required>
+
+            <label>Asociación</label>
+            <select name="asociacion">
+                {% for a in asociaciones %}
+                <option value="{{ a }}" {% if a == l.asociacion %}selected{% endif %}>{{ a }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Peso (Kg)</label>
+            <input type="number" step="0.1" name="peso" value="{{ l.peso }}" required>
+
+            <p style="color:gray; font-size:0.8em; margin-top:10px;">
+                * La categoría se ajustará automáticamente según el peso ingresado.
+            </p>
+
+            <button type="submit">GUARDAR CAMBIOS</button>
+            <a href="/admin/dashboard" style="display:block; text-align:center; margin-top:15px; color:#666;">Cancelar y volver</a>
+        </form>
+    </div>
+</body>
+</html>

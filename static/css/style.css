@@ -1,0 +1,133 @@
+/* Paleta de Colores FBLA */
+:root {
+    --primario-azul: #1a237e;
+    --secundario-rojo: #d32f2f;
+    --fondo-gris: #f4f7f9;
+    --blanco: #ffffff;
+    --texto: #333333;
+    --exito: #2e7d32;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--fondo-gris);
+    color: var(--texto);
+    margin: 0;
+    padding: 0;
+}
+
+/* Contenedor principal para el Registro */
+.container {
+    max-width: 650px;
+    background: var(--blanco);
+    margin: 40px auto;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+h1, h2 {
+    color: var(--primario-azul);
+    text-align: center;
+}
+
+/* Formularios */
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Importante para que no se salga del contenedor */
+}
+
+button {
+    width: 100%;
+    background-color: var(--primario-azul);
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 25px;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background-color: #0d47a1;
+}
+
+/* Cuadros de información de la convocatoria */
+.info-box {
+    background-color: #e3f2fd;
+    border-left: 5px solid var(--primario-azul);
+    padding: 15px;
+    margin-top: 20px;
+    font-size: 0.85em;
+    line-height: 1.5;
+}
+
+/* Estilos para el Dashboard del Administrador */
+.table-container {
+    max-width: 95%;
+    margin: 20px auto;
+    background: var(--blanco);
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th {
+    background-color: var(--primario-azul);
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Botones de acción en el Admin */
+.btn-check {
+    background: var(--exito);
+    color: white;
+    padding: 6px 12px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.8em;
+}
+
+.btn-del {
+    background: var(--secundario-rojo);
+    color: white;
+    padding: 6px 12px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.8em;
+}
+
+.status-ok {
+    color: var(--exito);
+    font-weight: bold;
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Administrativo - FBLA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div style="background:#1a237e; color:white; padding:15px; display:flex; justify-content:space-between; align-items:center;">
+        <h2 style="margin:0; font-size:1.2em;">Control de Inscritos 2026</h2>
+        <a href="/logout" style="color:white; text-decoration:none; font-weight:bold;">[ Cerrar Sesión ]</a>
+    </div>
+
+    <div class="table-container" style="max-width:95%; margin:20px auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Asociación</th>
+                    <th>Categoría</th>
+                    <th>CI / Doc</th>
+                    <th>Pago (120 Bs)</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for l in luchadores %}
+                <tr>
+                    <td>{{ l.nombre_completo }}</td>
+                    <td>{{ l.asociacion }}</td>
+                    <td><strong>{{ l.categoria }}</strong></td>
+                    <td>
+                        {% if l.documentacion_ok %} <span style="color:green">✔ Recibido</span> 
+                        {% else %} <a href="/admin/update_status/{{l.id}}/documentacion_ok" class="btn-check">Validar</a> {% endif %}
+                    </td>
+                    <td>
+                        {% if l.pago_realizado %} <span style="color:green">✔ Pagado</span> 
+                        {% else %} <a href="/admin/update_status/{{l.id}}/pago_realizado" class="btn-check" style="background:#2e7d32">Cobrar</a> {% endif %}
+                    </td>
+                    <td>
+                        <a href="/admin/editar/{{ l.id }}" style="color:blue; text-decoration:none;">Editar</a> | 
+                        <a href="/admin/eliminar/{{ l.id }}" style="color:red; text-decoration:none;" onclick="return confirm('¿Eliminar permanentemente?')">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
