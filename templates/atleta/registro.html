@@ -2,77 +2,159 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Inscripción FBLA 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FBLA - Registro Nacional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                'fbla-blue': '#1a237e',
+                'fbla-red': '#d32f2f',
+                'fbla-gold': '#fbc02d',
+              }
+            }
+          }
+        }
+    </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
-    <div class="container" style="padding:0; border:none;">
-        <div class="header-fbla">
-            <h2 style="color:white; margin:0;">FBLA - REGISTRO</h2>
-            <p style="margin:5px 0 0 0; font-size:0.9em;">Nacional Selectivo Santa Cruz 2026</p>
-        </div>
-        <div class="container" style="margin-top:0; border-radius:0 0 10px 10px;">
-            <form action="/inscribir" method="POST">
-                <label>Nombre Completo</label>
-                <input type="text" name="nombre_completo" required placeholder="Ej: Juan Pérez">
+<body class="antialiased">
 
-                <label>Cédula de Identidad (CI)</label>
-                <input type="text" name="ci" required>
+    <div class="relative h-[400px] flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-fbla-blue/80 to-slate-900/90 z-10"></div>
+        
+        <img src="https://as1.ftcdn.net/v2/jpg/03/16/89/71/1000_F_316897153_Z5NnOsqWlGZp6aHhXw6nF3rNqI4R9aYQ.jpg" 
+            class="absolute inset-0 w-full h-full object-cover" 
+                alt="Wrestling Background">
 
-                <label>Asociación Departamental</label>
-                <select name="asociacion" required>
-                    <option value="" disabled selected>Seleccione su departamento</option>
-                    {% for a in asociaciones %}
-                    <option value="{{ a }}">{{ a }}</option>
-                    {% endfor %}
-                </select>
-
-                <div style="display:flex; gap:15px;">
-                    <div style="flex:1;">
-                        <label>División</label>
-                        <select name="division">
-                            <option value="Senior">Sénior</option>
-                            <option value="U-17">U-17</option>
-                        </select>
-                    </div>
-                    <div style="flex:1;">
-                        <label>Género</label>
-                        <select name="sexo" id="sexo" onchange="validarEstilo()">
-                            <option value="Varones">Varones</option>
-                            <option value="Damas">Damas</option>
-                        </select>
-                    </div>
-                </div>
-
-                <label>Estilo</label>
-                <select name="estilo" id="estilo">
-                    <option value="Libre">Estilo Libre</option>
-                    <option value="Greco">Estilo Grecorromano</option>
-                </select>
-
-                <label>Peso Actual (Kg)</label>
-                <input type="number" step="0.1" name="peso" required placeholder="0.0">
-
-                <div class="info-box">
-                    <strong>Convocatoria:</strong> Inscripción Bs. 120. Presentar CI original y fotocopia doble al momento del pesaje.
-                </div>
-
-                <button type="submit">ENVIAR REGISTRO</button>
-            </form>
+        <div class="relative z-20 text-center px-4">
+            <div class="inline-block bg-fbla-red text-white text-xs font-black px-3 py-1 rounded-full mb-4 tracking-[0.2em] uppercase">
+                Bolivia 2026
+            </div>
+            <h1 class="text-5xl md:text-6xl font-black text-white italic tracking-tighter drop-shadow-2xl">
+                FBLA <span class="text-fbla-gold">BOLIVIA</span>
+            </h1>
+            <p class="text-blue-100 text-lg font-bold mt-2 tracking-widest uppercase opacity-90">
+                Inscripción Nacional de Lucha
+            </p>
         </div>
     </div>
 
+    <div class="container-fbla">
+        <form action="/inscribir" method="POST" class="space-y-6">
+            
+            <div class="flex items-center space-x-2 border-b border-gray-100 pb-2">
+                <div class="w-1.5 h-6 bg-fbla-red"></div>
+                <h2 class="text-xl font-black text-gray-800 uppercase italic">Datos del Competidor</h2>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-black text-fbla-blue mb-1">Nombre Completo</label>
+                    <input type="text" name="nombre_completo" class="w-full p-3 rounded-lg" placeholder="Ej: Juan Carlos Mamani" required>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-black text-fbla-blue mb-1">Cédula de Identidad</label>
+                        <input type="text" name="ci" class="w-full p-3 rounded-lg" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-fbla-blue mb-1">Asociación</label>
+                        <select name="asociacion" class="w-full p-3 rounded-lg" required>
+                            <option value="" disabled selected>Seleccione Ciudad...</option>
+                            {% for a in asociaciones %}
+                            <option value="{{ a }}">{{ a }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 border-b border-gray-100 pb-2 pt-4">
+                <div class="w-1.5 h-6 bg-fbla-gold"></div>
+                <h2 class="text-xl font-black text-gray-800 uppercase italic">Categoría de Lucha</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">División</label>
+                    <select name="division" id="division" class="w-full p-3 rounded-lg font-bold">
+                        <option value="Senior">Senior</option>
+                        <option value="U-17">U-17</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Género</label>
+                    <select name="sexo" id="sexo" class="w-full p-3 rounded-lg font-bold">
+                        <option value="Varones">Varones</option>
+                        <option value="Damas">Damas</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Estilo</label>
+                    <select name="estilo" id="estilo" class="w-full p-3 rounded-lg font-bold">
+                        <option value="Libre">Libre</option>
+                        <option value="Greco">Greco</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 p-6 rounded-2xl border-b-4 border-fbla-gold shadow-inner">
+                <label class="block text-center text-fbla-gold text-xs font-black tracking-[0.2em] mb-3 uppercase">Seleccione su Peso Oficial</label>
+                <select name="peso" id="peso_categoria" class="w-full bg-transparent text-white text-3xl font-black text-center border-none focus:ring-0 cursor-pointer" required>
+                    </select>
+            </div>
+
+            <button type="submit" class="btn-gradient w-full text-white font-black py-5 rounded-xl text-2xl shadow-2xl flex items-center justify-center space-x-3 active:scale-95 uppercase">
+                <span>Finalizar Inscripción</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+            </button>
+        </form>
+    </div>
+
     <script>
-        function validarEstilo() {
-            const sexo = document.getElementById('sexo').value;
-            const estilo = document.getElementById('estilo');
-            if (sexo === 'Damas') {
-                estilo.value = 'Libre';
-                estilo.options[1].disabled = true;
+        const categoriasPeso = {
+            "Senior-Varones-Libre": ["57 kg", "65 kg", "74 kg", "86 kg", "97 kg", "125 kg"],
+            "Senior-Varones-Greco": ["60 kg", "67 kg", "77 kg", "87 kg", "97 kg", "130 kg"],
+            "Senior-Damas-Libre": ["50 kg", "53 kg", "57 kg", "62 kg", "68 kg", "76 kg"],
+            "U-17-Varones-Libre": ["45 kg", "51 kg", "60 kg", "71 kg", "92 kg"],
+            "U-17-Varones-Greco": ["48 kg", "55 kg", "65 kg", "80 kg", "110 kg"],
+            "U-17-Damas-Libre": ["43 kg", "49 kg", "57 kg", "65 kg", "73 kg"]
+        };
+
+        function actualizarFormulario() {
+            const div = document.getElementById('division').value;
+            const sex = document.getElementById('sexo').value;
+            const estSel = document.getElementById('estilo');
+            const pesoSel = document.getElementById('peso_categoria');
+
+            if (sex === 'Damas') {
+                estSel.value = 'Libre';
+                estSel.options[1].disabled = true;
             } else {
-                estilo.options[1].disabled = false;
+                estSel.options[1].disabled = false;
             }
+
+            const llave = `${div}-${sex}-${estSel.value}`;
+            const opciones = categoriasPeso[llave] || [];
+
+            pesoSel.innerHTML = '<option value="" disabled selected>Elegir Peso</option>';
+            opciones.forEach(p => {
+                let opt = document.createElement("option");
+                opt.value = p; opt.innerHTML = p;
+                pesoSel.appendChild(opt);
+            });
         }
+
+        document.getElementById('division').addEventListener('change', actualizarFormulario);
+        document.getElementById('sexo').addEventListener('change', actualizarFormulario);
+        document.getElementById('estilo').addEventListener('change', actualizarFormulario);
+        window.onload = actualizarFormulario;
     </script>
 </body>
 </html>

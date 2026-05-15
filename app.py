@@ -1,15 +1,24 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, make_response
 import sqlite3
+from functools import wraps
 
 app = Flask(__name__)
 app.secret_key = 'fbla_bolivia_2026_key'
+app.config['SESSION_COOKIE_NAME'] = 'fbla_session_luchin'
 
-# Asociaciones preestablecidas según departamentos de Bolivia
-ASOCIACIONES = [
-    "La Paz", "Santa Cruz", "Cochabamba", 
-    "Chuquisaca", "Tarija", "Potosí", 
-    "Oruro", "Beni", "Pando"
-]
+# --- CONFIGURACIÓN DE SEGURIDAD (ANTI-CACHÉ) ---
+def nocache(view):
+    @wraps(view)
+    def no_cache_display(*args, **kwargs):
+        response = make_response(view(*args, **kwargs))
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '-1'
+        return response
+    return no_cache_display
+
+# --- BASE DE DATOS Y CONSTANTES ---
+ASOCIACIONES = ["La Paz", "Santa Cruz", "Cochabamba", "Chuquisaca", "Tarija", "Potosí", "Oruro", "Beni", "Pando"]
 
 def get_db_connection():
     conn = sqlite3.connect('sambo_bolivia.db')
@@ -35,8 +44,17 @@ def init_db():
         """)
         conn.commit()
 
+# CORREGIDO: Se quitó la 'd' extra al inicio
 def obtener_categoria(peso, division, estilo, sexo):
-    p = float(peso)
+    try:
+        if isinstance(peso, str):
+            peso_limpio = peso.lower().replace('kg', '').replace(',', '.').strip()
+            p = float(peso_limpio)
+        else:
+            p = float(peso)
+    except:
+        return "Peso no válido"
+
     if division == "U-17":
         if sexo == "Damas":
             if p <= 43: return "43 Kgrs"
@@ -97,29 +115,36 @@ def inscribir():
     div = request.form['division']
     est = request.form['estilo']
     sex = request.form['sexo']
-    peso = request.form['peso']
-    cat = obtener_categoria(peso, div, est, sex)
+    peso_raw = request.form['peso']
+    cat = obtener_categoria(peso_raw, div, est, sex)
+    try:
+        peso_numeric = float(peso_raw.lower().replace('kg', '').replace(',', '.').strip())
+    except:
+        peso_numeric = 0.0
 
     with get_db_connection() as conn:
         conn.execute("""INSERT INTO luchadores (nombre_completo, ci, asociacion, division, estilo, sexo, peso, categoria) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)""", (nombre, ci, asoc, div, est, sex, peso, cat))
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)""", (nombre, ci, asoc, div, est, sex, peso_numeric, cat))
         conn.commit()
     return render_template('atleta/exito.html')
 
-# --- VISTAS DEL ADMINISTRADOR ---
+# --- VISTAS DEL ADMINISTRADOR (CON PROTECCIÓN) ---
 
 @app.route('/login', methods=['GET', 'POST'])
+@nocache
 def login():
     if request.method == 'POST':
-        user = request.form['username']
-        pw = request.form['password']
+        user = request.form.get('username', '').strip()
+        pw = request.form.get('password', '').strip()
         if user == 'admin' and pw == 'Fbla2026':
+            session.clear()
             session['logged_in'] = True
             return redirect(url_for('dashboard'))
         flash('Credenciales incorrectas')
     return render_template('admin/login.html')
 
 @app.route('/admin/dashboard')
+@nocache 
 def dashboard():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
@@ -128,44 +153,43 @@ def dashboard():
     return render_template('admin/dashboard.html', luchadores=luchadores)
 
 @app.route('/admin/editar/<int:id>', methods=['GET', 'POST'])
+@nocache
 def editar(id):
     if not session.get('logged_in'):
         return redirect(url_for('login'))
-    
     conn = get_db_connection()
     l = conn.execute("SELECT * FROM luchadores WHERE id = ?", (id,)).fetchone()
-
     if request.method == 'POST':
         nombre = request.form['nombre_completo']
-        peso = request.form['peso']
+        peso_raw = request.form['peso']
         asoc = request.form['asociacion']
-        # Al editar el peso, recalculamos la categoría automáticamente
-        cat = obtener_categoria(peso, l['division'], l['estilo'], l['sexo'])
-        
+        cat = obtener_categoria(peso_raw, l['division'], l['estilo'], l['sexo'])
+        try:
+            peso_numeric = float(str(peso_raw).lower().replace('kg', '').replace(',', '.').strip())
+        except:
+            peso_numeric = l['peso']
         conn.execute("UPDATE luchadores SET nombre_completo=?, peso=?, asociacion=?, categoria=? WHERE id=?",
-                     (nombre, peso, asoc, cat, id))
+                     (nombre, peso_numeric, asoc, cat, id))
         conn.commit()
         conn.close()
         return redirect(url_for('dashboard'))
-    
     conn.close()
     return render_template('admin/editar.html', l=l, asociaciones=ASOCIACIONES)
 
 @app.route('/admin/eliminar/<int:id>')
+@nocache
 def eliminar(id):
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
+    if not session.get('logged_in'): return redirect(url_for('login'))
     with get_db_connection() as conn:
         conn.execute("DELETE FROM luchadores WHERE id = ?", (id,))
         conn.commit()
     return redirect(url_for('dashboard'))
 
 @app.route('/admin/update_status/<int:id>/<string:campo>')
+@nocache
 def update_status(id, campo):
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
+    if not session.get('logged_in'): return redirect(url_for('login'))
     with get_db_connection() as conn:
-        # Solo permite actualizar pago_realizado o documentacion_ok
         if campo in ['pago_realizado', 'documentacion_ok']:
             conn.execute(f"UPDATE luchadores SET {campo} = 1 WHERE id = ?", (id,))
             conn.commit()
@@ -173,7 +197,7 @@ def update_status(id, campo):
 
 @app.route('/logout')
 def logout():
-    session.pop('logged_in', None)
+    session.clear() 
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
